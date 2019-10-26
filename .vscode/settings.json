@@ -1,0 +1,8 @@
+{
+    "appService.deploySubpath": "",
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/a20536eb-8672-4f7b-9037-475c25ec3240/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/control-tendencias"
+}
