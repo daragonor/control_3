@@ -1,6 +1,6 @@
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
-
+var db = {}
 var config =
 {
     authentication: {
@@ -13,6 +13,7 @@ var config =
     server: 'tendenciasdb.database.windows.net', // update me
     options:
     {
+        rowCollectionOnDone: true,
         database: 'tendencias', //update me
         encrypt: true
     }
@@ -20,39 +21,40 @@ var config =
 var connection = new Connection(config);
 
 // Attempt to connect and execute queries if connection goes through
-connection.on('connect', function(err)
-    {
-        if (err)
-        {
-            console.log(err)
-        }
-        else
-        {
-            queryDatabase()
-        }
+connection.on('connect', function (err) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log('Database Connected')
     }
+}
 );
-
-function queryDatabase()
-{
+db.queryDatabase = function (handler) {
     console.log('Reading rows from the Table...');
 
     // Read all rows from table
     var request = new Request(
-        "SELECT * FROM tendencias.cajas",
-        function(err, rowCount, rows)
-        {
-            console.log(rowCount + ' row(s) returned');
-            process.exit();
+        "SELECT * FROM [dbo].[ITEM]",
+        function (err, rowCount, rows) {
+
         }
     );
 
-    request.on('row', function(columns) {
-        columns.forEach(function(column) {
-            console.log("%s\t%s", column.metadata.colName, column.value);
-        });
-    });
+    request.on('doneInProc', function (rowCount, more, rows) {
+        data = [];
+        rows.forEach((columns) => {
+            data.push({
+                id: columns[0].value,
+                name: columns[1].value,
+                stock: columns[2].value
+            })
+        })
+        console.log(data);
+        handler(data);
+    })
     connection.execSql(request);
 }
 
-module.exports = queryDatabase
+
+
+module.exports = db
